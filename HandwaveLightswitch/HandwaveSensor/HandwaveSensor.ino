@@ -1,14 +1,12 @@
+// Author: Eric Stevens
+
+
 
 #include <Arduino.h>
-
-//#define SEND_PWM_BY_TIMER         // Disable carrier PWM generation in software and use (restricted) hardware PWM.
-//#define USE_NO_SEND_PWM           // Use no carrier PWM, just simulate an active low receiver signal. Overrides SEND_PWM_BY_TIMER definition
-
-#include "PinDefinitionsAndMore.h" // Define macros for input and output pin etc.
+#include "PinDefinitionsAndMore.h" 
 #include <IRremote.hpp>
 #include <Wire.h>
 #include <VL53L0X.h>
-#define HIGH_SPEED
 #define REMOTE_CODE 0xF302FD
 VL53L0X DistanceSensor;
 
@@ -16,7 +14,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(9600);
-  IrSender.begin(); // Start with IR_SEND_PIN as send pin and if NO_LED_FEEDBACK_CODE is NOT defined, enable feedback LED at default feedback LED pin
+  IrSender.begin(); 
   delay(500);
   
   Wire.begin();
@@ -34,24 +32,8 @@ void setup() {
     while (1) {}
   }
   Serial.println("Successfully Configured.");
-
-#if defined LONG_RANGE
-  // lower the return signal rate limit (default is 0.25 MCPS)
-  DistanceSensor.setSignalRateLimit(0.1);
-  // increase laser pulse periods (defaults are 14 and 10 PCLKs)
-  DistanceSensor.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
-  DistanceSensor.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
-#endif
-
- 
-
-#if defined HIGH_SPEED
-  // reduce timing budget to 20 ms (default is about 33 ms)
   DistanceSensor.setMeasurementTimingBudget(20000);
-#elif defined HIGH_ACCURACY
-  // increase timing budget to 200 ms
-  DistanceSensor.setMeasurementTimingBudget(200000);
-#endif
+
 }
 
 boolean on = 1;
@@ -62,7 +44,6 @@ void toggleOn(){
   else{
     Serial.println("Off");
   }
-  
    IrSender.sendNEC(REMOTE_CODE, 32);
    IrSender.sendNEC(REMOTE_CODE, 32);
    IrSender.sendNEC(REMOTE_CODE, 32);
